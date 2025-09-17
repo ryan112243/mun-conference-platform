@@ -1,0 +1,13 @@
+{
+  "name": "mun-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "npx vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vite": "^7.1.5"
+  }
+}

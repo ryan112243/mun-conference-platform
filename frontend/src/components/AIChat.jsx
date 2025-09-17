@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useImperativeHandle, forwardRef, useRef } from 'react';
 import axios from 'axios';
 
-const AIChat = ({ country }) => {
+const AIChat = forwardRef(({ country, language = 'zh' }, ref) => {
   const [prompt, setPrompt] = useState('');
   const [nextPrompt, setNextPrompt] = useState('');
   const [conversations, setConversations] = useState([]);
@@ -10,6 +10,8 @@ const AIChat = ({ country }) => {
   const [wordToTranslate, setWordToTranslate] = useState('');
   const [translations, setTranslations] = useState([]);
   const [translating, setTranslating] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [textToSpeak, setTextToSpeak] = useState('');
   const selectedTextRef = useRef('');
   
   const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -47,6 +49,76 @@ const AIChat = ({ country }) => {
     setTranslations([]);
     selectedTextRef.current = '';
   };
+
+  // 朗讀功能
+  const handleSpeak = (text) => {
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      setTextToSpeak('');
+      return;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'zh-TW';
+    utterance.rate = 0.8;
+    
+    utterance.onstart = () => {
+      setIsSpeaking(true);
+      setTextToSpeak(text);
+    };
+    
+    utterance.onend = () => {
+      setIsSpeaking(false);
+      setTextToSpeak('');
+    };
+    
+    utterance.onerror = () => {
+      setIsSpeaking(false);
+      setTextToSpeak('');
+    };
+    
+    window.speechSynthesis.speak(utterance);
+  };
+
+  // 新的對話功能
+  const handleNewConversation = () => {
+    setConversations([]);
+    setPrompt('');
+    setNextPrompt('');
+    setSelectedResponse(null);
+    setWordToTranslate('');
+    setTranslations([]);
+  };
+
+  // 刪除單個對話
+  const handleDeleteConversation = (conversationId) => {
+    setConversations(conversations.filter(conv => conv.id !== conversationId));
+    // 如果刪除的是當前選中的對話，清除選擇狀態
+    if (selectedResponse && selectedResponse.conversationId === conversationId) {
+      setSelectedResponse(null);
+      setNextPrompt('');
+    }
+  };
+
+  // 清除所有對話（用於離開會議時調用）
+  const clearAllConversations = () => {
+    setConversations([]);
+    setPrompt('');
+    setNextPrompt('');
+    setSelectedResponse(null);
+    setWordToTranslate('');
+    setTranslations([]);
+  };
+
+  // 暴露清除函數給父組件
+  useEffect(() => {
+    if (window.clearAIConversations) {
+      window.clearAIConversations = clearAllConversations;
+    } else {
+      window.clearAIConversations = clearAllConversations;
+    }
+  }, []);
 
   // 發送問題給所有AI模型
   const handleSubmit = async (e) => {
@@ -155,32 +227,29 @@ const AIChat = ({ country }) => {
     }
   };
   
-  // 渲染AI回答
+  // 渲染AI回答 (隱藏AI身份)
   const renderAIResponse = (model, response, isSelected, onSelect) => {
-    const modelNames = {
-      chatgpt: 'ChatGPT',
-      gemini: 'Google Gemini',
-      claude: 'Claude'
-    };
-    
     return (
       <div 
         key={model}
         className={`p-4 rounded-lg mb-3 ${isSelected ? 'border-2 border-blue-500 bg-blue-50' : 'border border-gray-200 bg-gray-50'}`}
+        onMouseUp={handleTextSelection}
       >
         <div className="flex justify-between items-center mb-2">
-          <h3 className="font-medium text-lg">{modelNames[model] || model}</h3>
-          {!isSelected && !selectedResponse && (
-            <button 
-              onClick={() => onSelect(model)}
-              className="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600"
-            >
-              選擇此回答
-            </button>
-          )}
-          {isSelected && (
-            <span className="text-blue-500 text-sm font-medium">✓ 已選擇</span>
-          )}
+          <h3 className="font-medium text-lg">AI回答</h3>
+          <div className="flex space-x-2">
+            {!isSelected && !selectedResponse && (
+              <button 
+                onClick={() => onSelect(model)}
+                className="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600"
+              >
+                選擇此回答
+              </button>
+            )}
+            {isSelected && (
+              <span className="text-blue-500 text-sm font-medium">✓ 已選擇</span>
+            )}
+          </div>
         </div>
         
         {response.error ? (
@@ -188,7 +257,18 @@ const AIChat = ({ country }) => {
             <p>錯誤: {response.message}</p>
           </div>
         ) : (
-          <div className="whitespace-pre-wrap">{response.text}</div>
+          <div>
+            <div className="flex justify-between items-center mb-2">
+              <button 
+                onClick={() => handleSpeak(response.text)}
+                className="text-blue-500 hover:text-blue-700 text-sm"
+                disabled={isSpeaking}
+              >
+                {isSpeaking && textToSpeak === response.text ? '朗讀中...' : '朗讀全文'}
+              </button>
+            </div>
+            <div className="whitespace-pre-wrap">{response.text}</div>
+          </div>
         )}
       </div>
     );
@@ -196,18 +276,26 @@ const AIChat = ({ country }) => {
   
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-2xl font-semibold mb-4">AI 聊天</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-semibold">AI 聊天</h2>
+        <button 
+          onClick={handleNewConversation}
+          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+        >
+          新的對話
+        </button>
+      </div>
       
       {/* 翻譯功能 */}
-      <div className="mb-4 flex items-center">
+      <div className="mb-4 flex items-center flex-wrap gap-2">
         <button 
           onClick={handleTranslate}
-          className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 mr-2"
+          className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
           disabled={!selectedTextRef.current}
         >
           翻譯選定文字
         </button>
-        <span className="text-sm text-gray-500">(選擇文字後點擊翻譯按鈕)</span>
+        <span className="text-sm text-gray-500">(選擇文字後點擊按鈕)</span>
       </div>
       
       {/* 翻譯結果 */}
@@ -229,7 +317,9 @@ const AIChat = ({ country }) => {
             <div className="space-y-2">
               {translations.map((item, index) => (
                 <div key={index} className="border-b pb-2">
-                  <p><strong>定義:</strong> {item.definition}</p>
+                  <div>
+                    <p><strong>定義:</strong> {item.definition}</p>
+                  </div>
                   <p><strong>翻譯:</strong> {item.translation}</p>
                 </div>
               ))}
@@ -248,9 +338,23 @@ const AIChat = ({ country }) => {
         ) : (
           conversations.map((conversation) => (
             <div key={conversation.id} className="mb-8 pb-6 border-b border-gray-200">
+              {/* 對話標題和刪除按鈕 */}
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="font-medium text-lg">對話 #{conversation.id}</h3>
+                <button
+                  onClick={() => handleDeleteConversation(conversation.id)}
+                  className="text-red-500 hover:text-red-700 text-sm px-2 py-1 border border-red-300 rounded hover:bg-red-50"
+                  title="刪除此對話"
+                >
+                  🗑️ 刪除
+                </button>
+              </div>
+              
               {/* 用戶問題 */}
               <div className="bg-blue-100 p-3 rounded-lg mb-4">
-                <p className="font-medium">你:</p>
+                <div className="mb-2">
+                  <p className="font-medium">你:</p>
+                </div>
                 <p>{conversation.prompt}</p>
               </div>
               
@@ -271,7 +375,9 @@ const AIChat = ({ country }) => {
               {conversation.continuationPrompt && (
                 <div className="mt-6">
                   <div className="bg-blue-100 p-3 rounded-lg mb-4">
-                    <p className="font-medium">你 (繼續對話):</p>
+                    <div className="mb-2">
+                      <p className="font-medium">你 (繼續對話):</p>
+                    </div>
                     <p>{conversation.continuationPrompt}</p>
                   </div>
                   
@@ -292,7 +398,7 @@ const AIChat = ({ country }) => {
       {selectedResponse ? (
         <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
           <p className="mb-2">
-            <span className="font-medium">已選擇 {selectedResponse.model === 'chatgpt' ? 'ChatGPT' : selectedResponse.model === 'gemini' ? 'Google Gemini' : 'Claude'} 的回答</span>
+            <span className="font-medium">已選擇AI回答</span>
             <button 
               onClick={handleCancelSelection}
               className="ml-2 text-sm text-red-500 hover:text-red-700"
@@ -300,7 +406,7 @@ const AIChat = ({ country }) => {
               取消選擇
             </button>
           </p>
-          <p className="text-sm text-gray-600">請輸入後續問題，其他AI將基於選定的回答繼續對話</p>
+          <p className="text-sm text-gray-600">請輸入後續問題，AI將基於選定的回答繼續對話</p>
         </div>
       ) : null}
       
@@ -360,6 +466,6 @@ const AIChat = ({ country }) => {
       </form>
     </div>
   );
-};
+})
 
 export default AIChat;

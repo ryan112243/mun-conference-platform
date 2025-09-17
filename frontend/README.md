@@ -1,56 +1,43 @@
-# MUN Website Frontend
+# MUN Site Frontend
 
-This is the frontend for the MUN website project built with React, Vite, and Tailwind CSS.
+React frontend application for the MUN Site project.
 
-## Local Development
+## Development Setup
 
+1. Install dependencies:
 ```bash
-# Install dependencies
 npm install
-
-# Start development server
-npm run dev
 ```
 
-## Environment Variables
-
-Create a `.env` file in the frontend directory with the following variables:
-
-```
+2. Create a `.env` file:
+```env
 VITE_API_URL=http://localhost:5000
 ```
 
-For production, set this to your deployed backend URL.
-
-## Deployment to Netlify
-
-### Option 1: Netlify UI
-
-1. Push your code to a Git repository (GitHub, GitLab, etc.)
-2. Log in to [Netlify](https://app.netlify.com/)
-3. Click "New site from Git"
-4. Select your repository and branch
-5. Set build command to `npm run build`
-6. Set publish directory to `dist`
-7. Add environment variables in the Netlify UI
-8. Deploy!
-
-### Option 2: Netlify CLI
-
+3. Start the development server:
 ```bash
-# Install Netlify CLI
-npm install netlify-cli -g
-
-# Login to Netlify
-netlify login
-
-# Initialize Netlify site
-netlify init
-
-# Deploy to Netlify
-netlify deploy --prod
+npm run dev
 ```
 
-### Continuous Deployment
+The application will be available at http://localhost:5173
 
-Netlify will automatically deploy when you push to your connected repository.
+## Features
+
+- Meeting creation and joining interface
+- AI chat with translation and text-to-speech
+- Discussion forum
+- File management
+- Reading feature with text selection
+
+## Environment Variables
+
+- `VITE_API_URL`: Backend API URL (default: http://localhost:5000)
+
+## Build
+
+To build for production:
+```bash
+npm run build
+```
+
+The built files will be in the `dist` directory.

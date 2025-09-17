@@ -1,53 +1,49 @@
-# MUN Website Backend
+# MUN Site Backend
 
-This is the backend for the MUN website project built with Node.js and Express.
+Node.js backend API for the MUN Site project.
 
-## Local Development
+## Development Setup
 
+1. Install dependencies:
 ```bash
-# Install dependencies
 npm install
+```
 
-# Start development server
+2. Create a `.env` file:
+```env
+PORT=5000
+MONGODB_URI=mongodb://localhost:27017/mun-site
+NODE_ENV=development
+```
+
+3. Start the development server:
+```bash
 npm run dev
 ```
 
+The API will be available at http://localhost:5000
+
+## Features
+
+- RESTful API endpoints
+- MongoDB integration
+- AI chat functionality
+- File upload/download
+- Discussion forum API
+- Translation services
+
 ## Environment Variables
 
-Create a `.env` file in the backend directory with the following variables:
+- `PORT`: Server port (default: 5000)
+- `MONGODB_URI`: MongoDB connection string
+- `NODE_ENV`: Environment (development/production)
 
-```
-PORT=5000
-MONGO_URI=mongodb://localhost:27017/mun
-OPENAI_API_KEY=your_openai_api_key
-GEMINI_API_KEY=your_gemini_api_key
-CLAUDE_API_KEY=your_claude_api_key
-GOOGLE_OAUTH=your_google_oauth_credentials
-```
+## API Endpoints
 
-## Deployment to Render
+- `/api/ai/*` - AI chat and translation endpoints
+- `/api/discussions/*` - Discussion forum endpoints
+- `/api/files/*` - File management endpoints
 
-### Option 1: Render Dashboard
+## Database
 
-1. Push your code to a Git repository (GitHub, GitLab, etc.)
-2. Log in to [Render](https://dashboard.render.com/)
-3. Click "New" and select "Web Service"
-4. Connect your repository
-5. Configure the service:
-   - Name: mun-backend
-   - Environment: Node
-   - Build Command: `npm install`
-   - Start Command: `npm start`
-6. Add environment variables in the Render dashboard
-7. Deploy!
-
-### Option 2: Using render.yaml
-
-With the provided `render.yaml` file, you can use Render's Blueprint feature:
-
-1. Push your code with the `render.yaml` file to a Git repository
-2. Log in to Render and navigate to Blueprints
-3. Create a new Blueprint pointing to your repository
-4. Render will automatically configure the services defined in the YAML file
-5. Add your secret environment variables
-6. Deploy!
+The application uses MongoDB. Make sure you have MongoDB running locally or provide a cloud MongoDB URI in the environment variables.
