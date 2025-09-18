@@ -1,6 +1,15 @@
-# 部署指南 - GitHub 和 Render
+# 免費部署指南 - GitHub 和 Render
 
-本指南將詳細說明如何將 MUN Conference Platform 上傳到 GitHub 並部署到 Render。
+本指南將詳細說明如何將 MUN Conference Platform 免費部署到 Render，無需付費方案。
+
+## 🆓 免費部署概述
+
+Render 提供慷慨的免費方案，包括：
+- **Web 服務**：每月 750 小時運行時間
+- **靜態網站**：100GB 帶寬/月  
+- **PostgreSQL 數據庫**：512MB 存儲空間
+- **自動 SSL 證書**
+- **自定義域名支持**
 
 ## 第一步：準備 GitHub 上傳
 
@@ -31,7 +40,7 @@ git commit -m "Initial commit: MUN Conference Platform with multilingual support
    - 填寫倉庫信息：
      - **Repository name**: `mun-conference-platform`
      - **Description**: `A modern Model United Nations conference platform with multilingual support and AI chat assistant`
-     - **Visibility**: 選擇 Public 或 Private
+     - **Visibility**: 選擇 Public（免費用戶推薦）
      - **不要**勾選 "Initialize this repository with a README"
 
 3. **連接本地倉庫到 GitHub**
@@ -55,12 +64,12 @@ git commit -m "Initial commit: MUN Conference Platform with multilingual support
 
 ## 第二步：部署到 Render
 
-### 方法一：使用 Blueprint（推薦）
+### 方法一：使用 Blueprint（推薦 - 完全免費）
 
 1. **註冊 Render 帳號**
    - 訪問 [render.com](https://render.com)
    - 點擊 "Get Started"
-   - 選擇 "Sign up with GitHub" 使用 GitHub 帳號註冊
+   - 選擇 "Sign up with GitHub" 使用 GitHub 帳號註冊（完全免費）
 
 2. **創建 Blueprint 部署**
    - 登錄後，點擊 "New +"
@@ -68,16 +77,27 @@ git commit -m "Initial commit: MUN Conference Platform with multilingual support
    - 點擊 "Connect GitHub" 並授權 Render 訪問你的 GitHub
    - 選擇你剛創建的 `mun-conference-platform` 倉庫
    - Render 會自動檢測到 `render.yaml` 文件
+   - **重要**：確認所有服務都選擇了 "Free" 方案
    - 點擊 "Apply" 開始部署
 
 3. **等待部署完成**
-   - Render 會自動創建：
-     - MongoDB 數據庫
-     - 後端 Web Service
-     - 前端 Static Site
+   - Render 會自動創建（全部免費）：
+     - PostgreSQL 數據庫（免費 512MB）
+     - 後端 Web Service（免費 750 小時/月）
+     - 前端 Static Site（免費 100GB 帶寬/月）
    - 部署過程大約需要 5-10 分鐘
 
-### 方法二：手動部署
+### 💡 免費方案重要提醒
+
+**免費服務特點：**
+- ✅ **完全免費**：無需信用卡
+- ✅ **自動 SSL**：免費 HTTPS 證書
+- ✅ **自定義域名**：可綁定自己的域名
+- ⚠️ **睡眠模式**：15 分鐘無活動後進入睡眠
+- ⚠️ **冷啟動**：從睡眠狀態喚醒需要 30-60 秒
+- ⚠️ **數據庫限制**：免費數據庫 90 天後會被刪除
+
+### 方法二：手動部署（如果 Blueprint 不可用）
 
 如果 Blueprint 方法不可用，可以手動創建服務：
 
@@ -190,6 +210,42 @@ git commit -m "Initial commit: MUN Conference Platform with multilingual support
 - 查看 Render 官方文檔：[render.com/docs](https://render.com/docs)
 - 檢查項目的 GitHub Issues
 - 聯繫開發團隊
+
+## 💰 完全免費部署總結
+
+**恭喜！您已經學會如何完全免費部署 MUN 會議系統到 Render！**
+
+### 🎉 您獲得的免費服務：
+- ✅ **Web 應用託管**：750 小時/月運行時間
+- ✅ **靜態網站託管**：100GB 帶寬/月
+- ✅ **PostgreSQL 數據庫**：512MB 存儲空間
+- ✅ **自動 SSL 證書**：免費 HTTPS 加密
+- ✅ **自定義域名**：可綁定個人域名
+- ✅ **自動部署**：GitHub 推送自動更新
+
+### 📊 免費方案使用技巧：
+
+1. **避免睡眠模式**
+   - 設置定時器每 14 分鐘訪問一次網站
+   - 使用 UptimeRobot 等免費監控服務
+
+2. **數據備份策略**
+   - 定期導出數據庫數據
+   - 使用 GitHub Actions 自動備份
+   - 90 天前記得遷移重要數據
+
+3. **性能優化**
+   - 啟用前端緩存
+   - 壓縮圖片和資源
+   - 使用 CDN 加速靜態資源
+
+### 🚀 升級建議（可選）
+
+如果流量增長，可考慮升級：
+- **Starter 方案**：$7/月 - 無睡眠模式
+- **Standard 方案**：$25/月 - 更多資源
+
+但對於大多數個人項目和小型團隊，**免費方案已經完全足夠**！
 
 ## 更新部署
 
