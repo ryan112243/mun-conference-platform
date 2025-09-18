@@ -58,11 +58,46 @@ git push -u origin main
 3. 選擇 "Sign up with GitHub"
 4. 授權 Render 訪問你的 GitHub
 
-### 2.2 創建 PostgreSQL 數據庫
+### 🗄️ 第二步：創建免費數據庫
+
+### 2.1 使用 MongoDB Atlas（推薦）
+**MongoDB Atlas 提供 512MB 免費存儲空間，完全足夠 MUN 系統使用！**
+
+1. 訪問 [MongoDB Atlas](https://www.mongodb.com/atlas)
+2. 點擊 **"Try Free"** 註冊帳戶
+3. 創建免費集群：
+   ```
+   Cluster Name: mun-cluster
+   Cloud Provider: AWS
+   Region: 選擇離你最近的地區
+   Plan: M0 Sandbox (FREE)
+   ```
+
+4. 設置數據庫用戶：
+   ```
+   Username: mun_user
+   Password: 生成強密碼（記住這個密碼）
+   ```
+
+5. 設置網絡訪問：
+   - 添加你的當前 IP
+   - 添加 `0.0.0.0/0`（用於 Render 部署）
+
+6. 獲取連接字符串：
+   - 點擊 **"Connect"** → **"Drivers"**
+   - 複製連接字符串，格式如：
+   ```
+   mongodb+srv://mun_user:你的密碼@mun-cluster.xxxxx.mongodb.net/?retryWrites=true&w=majority
+   ```
+
+**詳細步驟請參考：** <mcfile name="MONGODB_SETUP_GUIDE.md" path="c:\Users\User\Desktop\MUN\mun-site\MONGODB_SETUP_GUIDE.md"></mcfile>
+
+### 2.2 替代方案：Render PostgreSQL（如果需要）
+如果你偏好使用 PostgreSQL：
+
 1. 在 Render Dashboard 點擊 **"New +"**
 2. 選擇 **"PostgreSQL"**
 3. 填寫數據庫配置：
-
    ```
    Name: mun-database
    Database: mun_conference
@@ -73,15 +108,10 @@ git push -u origin main
    ```
 
 4. 點擊 **"Create Database"**
+5. 等待數據庫狀態變為 **"Available"**（約 2-3 分鐘）
+6. 複製 **"External Database URL"**
 
-### 2.3 獲取數據庫連接信息
-1. 等待數據庫狀態變為 **"Available"**（約 2-3 分鐘）
-2. 在數據庫頁面找到 **"Connections"** 部分
-3. 複製 **"External Database URL"**，格式類似：
-   ```
-   postgresql://mun_user:xxxxx@dpg-xxxxx-a.oregon-postgres.render.com/mun_conference
-   ```
-4. **重要**：保存這個 URL，後端部署時需要用到
+**注意**：如果使用 PostgreSQL，需要修改後端代碼以使用 PostgreSQL 驅動而不是 MongoDB。
 
 ---
 
@@ -117,8 +147,8 @@ Plan: Free
 在 **"Environment Variables"** 部分點擊 **"Add Environment Variable"**，添加以下變數：
 
 ```bash
-# 數據庫連接（使用第二步獲得的 URL）
-MONGODB_URI=postgresql://mun_user:xxxxx@dpg-xxxxx-a.oregon-postgres.render.com/mun_conference
+# 數據庫連接（使用 MongoDB Atlas 獲得的連接字符串）
+MONGODB_URI=mongodb+srv://mun_user:你的密碼@mun-cluster.xxxxx.mongodb.net/?retryWrites=true&w=majority
 
 # JWT 密鑰（自己生成一個長隨機字符串）
 JWT_SECRET=mun-super-secret-jwt-key-2025-render-deployment-secure
