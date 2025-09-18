@@ -90,7 +90,7 @@ const InitialScreen = ({ onMeetingStart }) => {
     
     try {
       // 調用後端API創建會議
-      const response = await fetch('http://localhost:3001/api/users/create', {
+      const response = await fetch('http://localhost:5000/api/users/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -127,7 +127,7 @@ const InitialScreen = ({ onMeetingStart }) => {
     
     try {
       // 驗證邀請碼是否存在
-      const response = await fetch('http://localhost:3001/api/users/verify', {
+      const response = await fetch('http://localhost:5000/api/users/verify', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
