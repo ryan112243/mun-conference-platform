@@ -117,6 +117,14 @@ const MeetingRoom = ({ meetingData, onLeaveMeeting }) => {
               <span className="text-sm text-gray-500">
                 {t.country}: {meetingData.country}
               </span>
+              {meetingData.inviteCode && (
+                <div className="flex items-center space-x-2 bg-blue-50 px-3 py-1 rounded-lg">
+                  <span className="text-sm text-gray-600">{t.inviteCode}:</span>
+                  <span className="text-sm font-mono font-bold text-blue-600 bg-white px-2 py-1 rounded border">
+                    {meetingData.inviteCode}
+                  </span>
+                </div>
+              )}
             </div>
             
             <div className="flex items-center space-x-4">
