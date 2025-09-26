@@ -1,31 +1,29 @@
-import { useState, useEffect, useRef } from 'react';
-import AIChat from './AIChat';
+import { useState, useEffect } from 'react';
 import Discussions from './Discussions';
 import FileManager from './FileManager';
 import Translation from './Translation';
 import TextToSpeech from './TextToSpeech';
+import Upload from './Upload';
 
 const MeetingRoom = ({ meetingData, onLeaveMeeting }) => {
-  const [mode, setMode] = useState('ai'); // 'ai', 'discussion', 'files'
+  const [mode, setMode] = useState('discussion'); // 'discussion', 'files', 'translation', 'tts', 'upload'
   const [dialogues, setDialogues] = useState([]);
   const [currentDialogue, setCurrentDialogue] = useState(null);
   const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState(false);
   const [language, setLanguage] = useState(meetingData?.language || 'zh');
-  const aiChatRef = useRef(null);
 
   const translations = {
     zh: {
       meetingTitle: 'MUN 會議室',
       country: '代表國家',
       inviteCode: '邀請碼',
-      aiChat: 'AI 對話',
       discussion: '討論區',
       fileManager: '文件管理',
       translation: '翻譯',
       textToSpeech: '朗讀',
+      upload: '上傳',
       leaveMeeting: '離開會議',
-      newConversation: '新的對話',
       copyright: '© 2025 MUN 會議系統. 版權所有.',
       languageSelect: '語言',
       allRightsReserved: '版權所有',
@@ -35,13 +33,12 @@ const MeetingRoom = ({ meetingData, onLeaveMeeting }) => {
       meetingTitle: 'MUN Meeting Room',
       country: 'Representing Country',
       inviteCode: 'Invite Code',
-      aiChat: 'AI Chat',
       discussion: 'Discussion',
       fileManager: 'File Manager',
       translation: 'Translation',
       textToSpeech: 'Text to Speech',
+      upload: 'Upload',
       leaveMeeting: 'Leave Meeting',
-      newConversation: 'New Conversation',
       copyright: '© 2025 MUN Meeting System. All rights reserved.',
       languageSelect: 'Language',
       allRightsReserved: 'All rights reserved',
@@ -69,15 +66,6 @@ const MeetingRoom = ({ meetingData, onLeaveMeeting }) => {
     setDialogues(newDialogues);
   };
 
-  // 開啟新的AI對話框
-  const handleNewAIChat = () => {
-    setMode('ai');
-    // 觸發AIChat組件的新對話
-    if (aiChatRef.current && aiChatRef.current.handleNewConversation) {
-      aiChatRef.current.handleNewConversation();
-    }
-  };
-
   // 發送訊息到當前對話
   const sendMessage = async (message) => {
     if (!currentDialogue) return;
@@ -103,14 +91,8 @@ const MeetingRoom = ({ meetingData, onLeaveMeeting }) => {
   };
 
   const handleLeaveMeeting = () => {
-    // 清除AI對話記錄
-    if (aiChatRef.current && aiChatRef.current.clearAllConversations) {
-      aiChatRef.current.clearAllConversations();
-    }
-    
     // 清除本地存儲的對話數據
     localStorage.removeItem('munDialogues');
-    localStorage.removeItem('munAIConversations');
     
     // 重置狀態
     setDialogues([]);
@@ -130,7 +112,7 @@ const MeetingRoom = ({ meetingData, onLeaveMeeting }) => {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-4">
               <h1 className="text-xl font-bold text-gray-900">
-                {t.meetingRoom}: {meetingData.name}
+                {t.meetingTitle}: {meetingData.name}
               </h1>
               <span className="text-sm text-gray-500">
                 {t.country}: {meetingData.country}
@@ -176,16 +158,6 @@ const MeetingRoom = ({ meetingData, onLeaveMeeting }) => {
                 {t.discussion}
               </button>
               <button
-                onClick={() => setMode('ai')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  mode === 'ai'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                {t.aiChat}
-              </button>
-              <button
                 onClick={() => setMode('files')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${
                   mode === 'files'
@@ -215,21 +187,26 @@ const MeetingRoom = ({ meetingData, onLeaveMeeting }) => {
               >
                 {t.textToSpeech}
               </button>
+              <button
+                onClick={() => setMode('upload')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  mode === 'upload'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                {t.upload}
+              </button>
             </nav>
           </div>
           
           {/* 選項卡內容 */}
           <div className="p-6">
             {mode === 'discussion' && <Discussions />}
-            {mode === 'ai' && (
-              <AIChat 
-                ref={aiChatRef}
-                language={language}
-              />
-            )}
             {mode === 'files' && <FileManager />}
             {mode === 'translation' && <Translation />}
             {mode === 'tts' && <TextToSpeech />}
+            {mode === 'upload' && <Upload />}
           </div>
         </div>
       </div>

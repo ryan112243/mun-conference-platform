@@ -34,23 +34,12 @@ app.get('/', (req, res) => {
   res.json({ message: 'MUN API is running' });
 });
 
-// Example route that uses API keys
-app.get('/api/ai-services', (req, res) => {
-  const services = [];
-  
-  if (process.env.OPENAI_API_KEY) {
-    services.push('OpenAI');
-  }
-  
-  if (process.env.GEMINI_API_KEY) {
-    services.push('Gemini');
-  }
-  
-  if (process.env.CLAUDE_API_KEY) {
-    services.push('Claude');
-  }
-  
-  res.json({ available_services: services });
+// Translation services status
+app.get('/api/translation-services', (req, res) => {
+  res.json({ 
+    available_services: ['Cambridge Dictionary', 'MyMemory Translator'],
+    status: 'active'
+  });
 });
 
 // Use routes
